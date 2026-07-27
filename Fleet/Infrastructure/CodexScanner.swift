@@ -68,7 +68,15 @@ enum CodexScanner {
     }
 
     private static func parseSession(at url: URL, threadNames: [String: String], isActive: Bool) -> SessionRecord? {
-        guard let meta = firstJSON(in: JSONLTail.headLines(of: url), whereType: "session_meta"),
+        // `session_meta`'s line embeds the full system prompt
+        // (`base_instructions.text`), which alone runs 15-22KB on a regular
+        // interactive session — comfortably over a "small head read" budget.
+        // A default 8KB budget silently truncated that line mid-JSON, so
+        // parsing failed and every regular session got dropped; only
+        // subagent-type sessions (a much shorter session_meta line) survived.
+        // Found via real-machine testing 2026-07-27, not a hypothetical.
+        let headLines = JSONLTail.headLines(of: url, maxLines: 3, maxBytes: 262_144)
+        guard let meta = firstJSON(in: headLines, whereType: "session_meta"),
               let payload = meta["payload"] as? [String: Any],
               let sessionID = (payload["session_id"] as? String) ?? (payload["id"] as? String),
               let cwd = payload["cwd"] as? String else { return nil }
