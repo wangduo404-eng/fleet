@@ -56,8 +56,13 @@ struct ActiveSessionCard: View {
                 }
                 .buttonStyle(.bordered)
 
+                // A session on this card is, by definition, already running
+                // — "resume" doesn't mean anything for it, so it's disabled
+                // rather than a live no-op button (2026-07-27 feedback).
                 Button("恢复") {}
                     .buttonStyle(.borderedProminent)
+                    .tint(.gray)
+                    .disabled(true)
             }
             .font(.system(size: 12.5))
             .padding(.top, 4)
