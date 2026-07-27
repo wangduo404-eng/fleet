@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SessionListRow: View {
     let session: SessionRecord
+    @EnvironmentObject private var model: AppModel
 
     var body: some View {
         HStack(spacing: 10) {
@@ -11,8 +12,13 @@ struct SessionListRow: View {
                 .frame(width: 16)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(session.displayName)
-                    .font(.system(size: 13))
+                EditableNameLabel(
+                    name: session.displayName,
+                    font: .system(size: 13),
+                    textColor: .primary
+                ) { newName in
+                    model.rename(session, to: newName)
+                }
                 Text("\(session.projectPath) · \(session.lastActiveDescription)")
                     .font(FleetFont.mono(11))
                     .foregroundStyle(.secondary)

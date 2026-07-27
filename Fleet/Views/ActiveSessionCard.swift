@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ActiveSessionCard: View {
     let session: SessionRecord
+    @EnvironmentObject private var model: AppModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -17,15 +18,34 @@ struct ActiveSessionCard: View {
                     .foregroundStyle(textColor.opacity(0.6))
             }
 
-            Text(session.displayName)
-                .font(.system(size: 14.5, weight: .medium))
-                .foregroundStyle(textColor.opacity(0.92))
+            EditableNameLabel(
+                name: session.displayName,
+                font: .system(size: 14.5, weight: .medium),
+                textColor: textColor.opacity(0.92)
+            ) { newName in
+                model.rename(session, to: newName)
+            }
+
+            if let contextUsage = session.contextUsage {
+                VStack(alignment: .leading, spacing: 3) {
+                    if let fraction = contextUsage.fraction {
+                        ProgressView(value: fraction)
+                            .tint(FleetColor.mint)
+                    }
+                    Text("上下文 · \(contextUsage.description)")
+                        .font(.system(size: 11))
+                        .foregroundStyle(textColor.opacity(0.65))
+                }
+            }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(session.id)
                     .font(FleetFont.mono(11))
                     .foregroundStyle(textColor.opacity(0.45))
                 Text(session.projectPath)
+                    .font(FleetFont.mono(11))
+                    .foregroundStyle(textColor.opacity(0.45))
+                Text("记录大小 · \(session.recordSizeDescription)")
                     .font(FleetFont.mono(11))
                     .foregroundStyle(textColor.opacity(0.45))
             }
