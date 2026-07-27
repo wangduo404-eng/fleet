@@ -37,14 +37,28 @@ enum ClaudeCodeScanner {
         }
         var activeSessionIDs: Set<String> = []
         for file in files where file.pathExtension == "json" {
-            guard let data = try? Data(contentsOf: file),
-                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            guard let json = readRegistryEntry(at: file),
                   let sessionID = json["sessionId"] as? String,
                   let pid = json["pid"] as? Int,
                   ProcessInspector.isAlive(pid: Int32(pid)) else { continue }
             activeSessionIDs.insert(sessionID)
         }
         return activeSessionIDs
+    }
+
+    /// Claude Code rewrites this registry file frequently (every status
+    /// change), so there's a real, observed-in-practice race where Fleet's
+    /// scan can catch it mid-write and get a truncated read. One retry after
+    /// a short delay is enough in practice — the write is a few hundred
+    /// bytes and completes near-instantly.
+    private static func readRegistryEntry(at url: URL, attempt: Int = 0) -> [String: Any]? {
+        if let data = try? Data(contentsOf: url),
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            return json
+        }
+        guard attempt == 0 else { return nil }
+        Thread.sleep(forTimeInterval: 0.05)
+        return readRegistryEntry(at: url, attempt: 1)
     }
 
     private static func parseSession(at url: URL, activePIDs: Set<String>) -> SessionRecord? {
