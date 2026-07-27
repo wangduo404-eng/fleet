@@ -38,14 +38,9 @@ struct ActiveSessionCard: View {
                 }
             }
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(session.projectPath)
-                    .font(FleetFont.mono(11))
-                    .foregroundStyle(textColor.opacity(0.45))
-                Text("记录大小 · \(session.recordSizeDescription)")
-                    .font(FleetFont.mono(11))
-                    .foregroundStyle(textColor.opacity(0.45))
-            }
+            Text("记录大小 · \(session.recordSizeDescription)")
+                .font(FleetFont.mono(11))
+                .foregroundStyle(textColor.opacity(0.45))
 
             HStack(spacing: 8) {
                 Button("复制命令") {
@@ -61,7 +56,7 @@ struct ActiveSessionCard: View {
             .padding(.top, 4)
         }
         .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
