@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainContentView: View {
     @EnvironmentObject private var model: AppModel
+    @State private var selectedSession: SessionRecord?
 
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
@@ -30,7 +31,9 @@ struct MainContentView: View {
 
                         VStack(spacing: 0) {
                             ForEach(Array(model.otherSessions.enumerated()), id: \.element.id) { index, session in
-                                SessionListRow(session: session)
+                                SessionListRow(session: session) {
+                                    selectedSession = session
+                                }
                                 if index < model.otherSessions.count - 1 {
                                     Divider()
                                 }
@@ -44,6 +47,10 @@ struct MainContentView: View {
             .padding(24)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .sheet(item: $selectedSession) { session in
+            let current = model.sessions.first(where: { $0.id == session.id }) ?? session
+            SessionDetailView(session: current)
+        }
     }
 
     private var header: some View {

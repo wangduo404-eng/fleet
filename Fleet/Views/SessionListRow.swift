@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SessionListRow: View {
     let session: SessionRecord
+    let onSelect: () -> Void
     @EnvironmentObject private var model: AppModel
 
     var body: some View {
@@ -23,6 +24,8 @@ struct SessionListRow: View {
                     .font(FleetFont.mono(11))
                     .foregroundStyle(.secondary)
             }
+            .contentShape(Rectangle())
+            .onTapGesture(perform: onSelect)
 
             Spacer()
 
