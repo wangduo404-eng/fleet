@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import SwiftUI
 
 enum StatusFilter: String, CaseIterable, Identifiable {
     case all = "全部"
@@ -27,7 +28,19 @@ final class AppModel: ObservableObject {
         let scanned = await Task.detached(priority: .userInitiated) { () -> [SessionRecord] in
             ClaudeCodeScanner.scan() + CodexScanner.scan()
         }.value
-        sessions = scanned.sorted { $0.lastActiveAt > $1.lastActiveAt }
+
+        // Populating ~245 rows in one shot (empty -> full) let SwiftUI's
+        // default implicit animation leave a stale frame on screen — a
+        // ghost card briefly overlapping the real one until the next redraw
+        // (observed in practice: gone as soon as the window took focus
+        // again). Disabling animation for this specific assignment avoids
+        // that cross-fade entirely instead of relying on "look away and
+        // back" to self-heal it.
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            sessions = scanned.sorted { $0.lastActiveAt > $1.lastActiveAt }
+        }
         lastSyncedAt = Date()
         isLoading = false
     }

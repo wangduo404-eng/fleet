@@ -56,7 +56,14 @@ struct ActiveSessionCard: View {
             .padding(.top, 4)
         }
         .padding(14)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        // `maxHeight: .infinity` here previously caused a real bug: inside a
+        // 2-column LazyVGrid with 3+ active cards (so 2 rows), it made a
+        // taller row-1 card (this one, with the extra context-usage line)
+        // try to fill *all* remaining scroll-view height rather than just
+        // its own row, visually overlapping into row 2's cards. A fixed
+        // minHeight covering the tallest content variant fixes the uneven
+        // heights within a row without that runaway expansion.
+        .frame(maxWidth: .infinity, minHeight: 200, alignment: .topLeading)
         .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
