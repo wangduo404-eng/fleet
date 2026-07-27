@@ -27,25 +27,6 @@ struct SidebarView: View {
                 .padding(.horizontal, 18)
                 .padding(.bottom, 8)
 
-            filterSection(title: "状态") {
-                ForEach(StatusFilter.allCases) { status in
-                    filterRow(
-                        label: status.rawValue,
-                        count: model.count(for: status),
-                        isSelected: browsing && model.statusFilter == status,
-                        dotColor: dotColor(for: status)
-                    ) {
-                        model.viewMode = .browse
-                        model.statusFilter = status
-                    }
-                }
-            }
-
-            Divider()
-                .overlay(Color.white.opacity(0.1))
-                .padding(.horizontal, 18)
-                .padding(.vertical, 12)
-
             filterSection(title: "引擎") {
                 filterRow(
                     label: "全部引擎",
@@ -195,12 +176,4 @@ struct SidebarView: View {
         .buttonStyle(.plain)
     }
 
-    private func dotColor(for status: StatusFilter) -> Color? {
-        switch status {
-        case .all: return nil
-        case .active: return FleetColor.mint
-        case .idle: return .white.opacity(0.4)
-        case .expired: return FleetColor.expired
-        }
-    }
 }
