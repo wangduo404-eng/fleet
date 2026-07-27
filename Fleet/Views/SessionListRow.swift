@@ -29,6 +29,9 @@ struct SessionListRow: View {
 
             Spacer()
 
+            BookmarkButton(session: session)
+                .foregroundStyle(session.isBookmarked ? Color.yellow : Color.secondary.opacity(0.5))
+
             if session.status == .expired {
                 Text("疑似过期")
                     .font(.system(size: 10.5, weight: .medium))

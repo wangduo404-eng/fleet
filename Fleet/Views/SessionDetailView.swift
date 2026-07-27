@@ -14,6 +14,8 @@ struct SessionDetailView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(session.engine.accentColor)
                 Spacer()
+                BookmarkButton(session: session, size: 13)
+                    .foregroundStyle(session.isBookmarked ? Color.yellow : Color.secondary)
                 Button {
                     dismiss()
                 } label: {

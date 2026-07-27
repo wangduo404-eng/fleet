@@ -17,6 +17,7 @@ enum StatusFilter: String, CaseIterable, Identifiable {
 /// contradictory selections at once (2026-07-27 design feedback).
 enum ViewMode {
     case home
+    case bookmarks
     case browse
 }
 
@@ -109,6 +110,15 @@ final class AppModel: ObservableObject {
         homeSessions.filter { $0.engine == .codex }
     }
 
+    /// Sessions the user explicitly marked as "I'll want this again" —
+    /// unlike Home, not restricted to active/terminal-origin, since the
+    /// whole point is finding something again *after* it's no longer
+    /// running (2026-07-27: bookmarking replaces guessing a "recently
+    /// closed" time window).
+    var bookmarkedSessions: [SessionRecord] {
+        sessions.filter { $0.isBookmarked }.sorted { $0.lastActiveAt > $1.lastActiveAt }
+    }
+
     func count(for status: StatusFilter) -> Int {
         switch status {
         case .all: return sessions.count
@@ -135,5 +145,14 @@ final class AppModel: ObservableObject {
         guard let index = sessions.firstIndex(where: { $0.id == session.id }) else { return }
         sessions[index].displayName = newName
         NameStore.shared.setName(newName, for: session.id)
+    }
+
+    /// Bookmarking is Fleet's own overlay, same as rename — it never
+    /// touches `~/.claude` or `~/.codex`.
+    func toggleBookmark(_ session: SessionRecord) {
+        guard let index = sessions.firstIndex(where: { $0.id == session.id }) else { return }
+        let newValue = !sessions[index].isBookmarked
+        sessions[index].isBookmarked = newValue
+        BookmarkStore.shared.setBookmarked(newValue, for: session.id)
     }
 }

@@ -84,7 +84,8 @@ enum ClaudeCodeScanner {
             lastActiveAt: mtime,
             fileSizeBytes: sizeBytes,
             contextUsage: contextUsage,
-            resumeCommand: "claude --resume \(sessionID)"
+            resumeCommand: "claude --resume \(sessionID)",
+            isBookmarked: BookmarkStore.shared.isBookmarked(sessionID)
         )
     }
 

@@ -116,7 +116,8 @@ enum CodexScanner {
             lastActiveAt: mtime,
             fileSizeBytes: sizeBytes,
             contextUsage: contextUsage,
-            resumeCommand: "codex resume \(sessionID)"
+            resumeCommand: "codex resume \(sessionID)",
+            isBookmarked: BookmarkStore.shared.isBookmarked(sessionID)
         )
     }
 

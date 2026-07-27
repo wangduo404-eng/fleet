@@ -16,6 +16,9 @@ struct ActiveSessionCard: View {
                 Text(session.lastActiveDescription)
                     .font(.system(size: 11.5))
                     .foregroundStyle(textColor.opacity(0.6))
+                Spacer()
+                BookmarkButton(session: session, size: 12)
+                    .foregroundStyle(textColor.opacity(session.isBookmarked ? 0.85 : 0.35))
             }
 
             EditableNameLabel(

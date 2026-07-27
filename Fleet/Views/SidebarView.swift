@@ -16,9 +16,12 @@ struct SidebarView: View {
                 .padding(.top, 2)
                 .padding(.bottom, 18)
 
-            homeNavItem
-                .padding(.horizontal, 10)
-                .padding(.bottom, 16)
+            VStack(spacing: 2) {
+                primaryNavItem(icon: "house.fill", label: "首页", count: model.homeClaudeSessions.count + model.homeCodexSessions.count, mode: .home)
+                primaryNavItem(icon: "bookmark.fill", label: "书签", count: model.bookmarkedSessions.count, mode: .bookmarks)
+            }
+            .padding(.horizontal, 10)
+            .padding(.bottom, 16)
 
             Text("浏览全部 SESSION")
                 .font(.system(size: 10))
@@ -91,25 +94,26 @@ struct SidebarView: View {
 
     private var browsing: Bool { model.viewMode == .browse }
 
-    private var homeNavItem: some View {
-        Button {
-            model.viewMode = .home
+    private func primaryNavItem(icon: String, label: String, count: Int, mode: ViewMode) -> some View {
+        let isOn = model.viewMode == mode
+        return Button {
+            model.viewMode = mode
         } label: {
             HStack(spacing: 9) {
-                Image(systemName: "house.fill")
+                Image(systemName: icon)
                     .font(.system(size: 12))
-                Text("首页")
+                Text(label)
                     .font(.system(size: 13.5, weight: .semibold))
                 Spacer()
-                Text("\(model.homeClaudeSessions.count + model.homeCodexSessions.count)")
+                Text("\(count)")
                     .font(.system(size: 11.5, weight: .semibold))
                     .opacity(0.75)
             }
             .padding(8)
-            .foregroundStyle(model.viewMode == .home ? FleetColor.sidebarBackground : .white.opacity(0.6))
+            .foregroundStyle(isOn ? FleetColor.sidebarBackground : .white.opacity(0.6))
             .background(
                 RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(model.viewMode == .home ? FleetColor.mint : .clear)
+                    .fill(isOn ? FleetColor.mint : .clear)
             )
         }
         .buttonStyle(.plain)

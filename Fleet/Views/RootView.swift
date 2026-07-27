@@ -10,6 +10,8 @@ struct RootView: View {
                 switch model.viewMode {
                 case .home:
                     HomeView()
+                case .bookmarks:
+                    BookmarksView()
                 case .browse:
                     MainContentView()
                 }

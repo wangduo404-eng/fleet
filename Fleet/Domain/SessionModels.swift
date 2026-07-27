@@ -78,6 +78,7 @@ struct SessionRecord: Identifiable, Sendable {
     let fileSizeBytes: Int64
     let contextUsage: ContextUsage?
     let resumeCommand: String
+    var isBookmarked: Bool
 
     var status: SessionStatus {
         if isActive { return .active }
