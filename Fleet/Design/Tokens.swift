@@ -6,13 +6,50 @@ enum FleetColor {
     static let sidebarAccent = Color(hex: 0x0F6E56)
     static let mint = Color(hex: 0x5DCAA5)
 
-    static let claudeCardBackground = Color(hex: 0xE1F5EE)
-    static let codexCardBackground = Color(hex: 0xEEEDFE)
-    static let codexCardText = Color(hex: 0x3C3489)
+    /// Anthropic's brand terracotta/orange.
+    static let claudeAccent = Color(hex: 0xD97757)
+    static let claudeCardBackground = Color(hex: 0xF7E9E2)
+    static let claudeCardText = Color(hex: 0x7A3B22)
+
+    /// OpenAI's brand teal (used for Codex, OpenAI's CLI product).
+    static let codexAccent = Color(hex: 0x10A37F)
+    static let codexCardBackground = Color(hex: 0xDFF3EC)
+    static let codexCardText = Color(hex: 0x0B6B54)
 
     static let idle = Color(hex: 0x888780)
     static let expired = Color(hex: 0xEF9F27)
     static let expiredText = Color(hex: 0x854F0B)
+}
+
+extension Engine {
+    /// Solid brand-color swatch used for the engine's color block/icon.
+    var accentColor: Color {
+        switch self {
+        case .claudeCode: return FleetColor.claudeAccent
+        case .codex: return FleetColor.codexAccent
+        }
+    }
+
+    var cardBackground: Color {
+        switch self {
+        case .claudeCode: return FleetColor.claudeCardBackground
+        case .codex: return FleetColor.codexCardBackground
+        }
+    }
+
+    var cardTextColor: Color {
+        switch self {
+        case .claudeCode: return FleetColor.claudeCardText
+        case .codex: return FleetColor.codexCardText
+        }
+    }
+
+    var symbolName: String {
+        switch self {
+        case .claudeCode: return "bubble.left.and.bubble.right"
+        case .codex: return "terminal"
+        }
+    }
 }
 
 enum FleetFont {

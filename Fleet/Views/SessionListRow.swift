@@ -6,9 +6,9 @@ struct SessionListRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: session.engine == .claudeCode ? "bubble.left.and.bubble.right" : "terminal")
+            Image(systemName: session.engine.symbolName)
                 .font(.system(size: 12))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(session.engine.accentColor)
                 .frame(width: 16)
 
             VStack(alignment: .leading, spacing: 1) {

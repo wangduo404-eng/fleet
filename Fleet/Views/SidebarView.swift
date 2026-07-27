@@ -48,7 +48,7 @@ struct SidebarView: View {
                         label: engine.rawValue,
                         count: model.count(for: engine),
                         isSelected: model.engineFilter == engine,
-                        dotColor: nil
+                        swatchColor: engine.accentColor
                     ) {
                         model.engineFilter = engine
                     }
@@ -98,7 +98,8 @@ struct SidebarView: View {
         label: String,
         count: Int,
         isSelected: Bool,
-        dotColor: Color?,
+        dotColor: Color? = nil,
+        swatchColor: Color? = nil,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
@@ -107,6 +108,11 @@ struct SidebarView: View {
                     Circle()
                         .fill(dotColor)
                         .frame(width: 6, height: 6)
+                }
+                if let swatchColor {
+                    RoundedRectangle(cornerRadius: 3, style: .continuous)
+                        .fill(swatchColor)
+                        .frame(width: 10, height: 10)
                 }
                 Text(label)
                     .font(.system(size: 13))

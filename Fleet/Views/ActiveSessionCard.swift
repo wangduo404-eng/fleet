@@ -10,9 +10,9 @@ struct ActiveSessionCard: View {
                 Circle()
                     .fill(FleetColor.mint)
                     .frame(width: 7, height: 7)
-                Image(systemName: session.engine == .claudeCode ? "bubble.left.and.bubble.right" : "terminal")
+                Image(systemName: session.engine.symbolName)
                     .font(.system(size: 11))
-                    .foregroundStyle(textColor.opacity(0.6))
+                    .foregroundStyle(session.engine.accentColor)
                 Text(session.lastActiveDescription)
                     .font(.system(size: 11.5))
                     .foregroundStyle(textColor.opacity(0.6))
@@ -39,9 +39,6 @@ struct ActiveSessionCard: View {
             }
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(session.id)
-                    .font(FleetFont.mono(11))
-                    .foregroundStyle(textColor.opacity(0.45))
                 Text(session.projectPath)
                     .font(FleetFont.mono(11))
                     .foregroundStyle(textColor.opacity(0.45))
@@ -69,11 +66,7 @@ struct ActiveSessionCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
-    private var cardBackground: Color {
-        session.engine == .claudeCode ? FleetColor.claudeCardBackground : FleetColor.codexCardBackground
-    }
+    private var cardBackground: Color { session.engine.cardBackground }
 
-    private var textColor: Color {
-        session.engine == .claudeCode ? .primary : FleetColor.codexCardText
-    }
+    private var textColor: Color { session.engine.cardTextColor }
 }
