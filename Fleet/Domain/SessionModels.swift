@@ -49,6 +49,11 @@ struct SessionRecord: Identifiable, Sendable {
     /// "疑似过期" — a heuristic, easy to retune later.
     static let expiredThreshold: TimeInterval = 14 * 24 * 3600
 
+    /// Separate from `expiredThreshold` — this is purely a UI decluttering
+    /// threshold. With 245+ historical sessions, anything untouched for a
+    /// month gets folded away behind a "show older" disclosure by default.
+    static let longUnusedThreshold: TimeInterval = 30 * 24 * 3600
+
     let id: String
     let engine: Engine
     var displayName: String
@@ -70,6 +75,10 @@ struct SessionRecord: Identifiable, Sendable {
 
     var recordSizeDescription: String {
         ByteCountFormatter.string(fromByteCount: fileSizeBytes, countStyle: .file)
+    }
+
+    var isLongUnused: Bool {
+        !isActive && Date().timeIntervalSince(lastActiveAt) > Self.longUnusedThreshold
     }
 }
 

@@ -3,8 +3,19 @@ import SwiftUI
 struct MainContentView: View {
     @EnvironmentObject private var model: AppModel
     @State private var selectedSession: SessionRecord?
+    @State private var showOlderSessions = false
 
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
+
+    // Searching implies looking for something specific regardless of age,
+    // so the age-based fold only applies when there's no active search.
+    private var recentOtherSessions: [SessionRecord] {
+        model.searchText.isEmpty ? model.otherSessions.filter { !$0.isLongUnused } : model.otherSessions
+    }
+
+    private var olderOtherSessions: [SessionRecord] {
+        model.searchText.isEmpty ? model.otherSessions.filter { $0.isLongUnused } : []
+    }
 
     var body: some View {
         ScrollView {
@@ -21,7 +32,7 @@ struct MainContentView: View {
                     }
                 }
 
-                if !model.otherSessions.isEmpty {
+                if !recentOtherSessions.isEmpty {
                     VStack(alignment: .leading, spacing: 0) {
                         Text("其他 SESSION")
                             .font(.system(size: 10.5))
@@ -29,15 +40,29 @@ struct MainContentView: View {
                             .foregroundStyle(.secondary)
                             .padding(.bottom, 6)
 
-                        VStack(spacing: 0) {
-                            ForEach(Array(model.otherSessions.enumerated()), id: \.element.id) { index, session in
-                                SessionListRow(session: session) {
-                                    selectedSession = session
-                                }
-                                if index < model.otherSessions.count - 1 {
-                                    Divider()
-                                }
+                        sessionRows(recentOtherSessions)
+                    }
+                }
+
+                if !olderOtherSessions.isEmpty {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Button {
+                            showOlderSessions.toggle()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: showOlderSessions ? "chevron.down" : "chevron.right")
+                                    .font(.system(size: 9, weight: .semibold))
+                                Text("一个月前的 SESSION（\(olderOtherSessions.count)）")
+                                    .font(.system(size: 10.5))
+                                    .tracking(0.8)
                             }
+                            .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.bottom, 6)
+
+                        if showOlderSessions {
+                            sessionRows(olderOtherSessions)
                         }
                     }
                 }
@@ -66,6 +91,19 @@ struct MainContentView: View {
             Text("\(model.syncStatusDescription) · 全部数据存储在本机")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    private func sessionRows(_ sessions: [SessionRecord]) -> some View {
+        VStack(spacing: 0) {
+            ForEach(Array(sessions.enumerated()), id: \.element.id) { index, session in
+                SessionListRow(session: session) {
+                    selectedSession = session
+                }
+                if index < sessions.count - 1 {
+                    Divider()
+                }
+            }
         }
     }
 
