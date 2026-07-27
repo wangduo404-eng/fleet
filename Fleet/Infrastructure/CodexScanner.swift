@@ -48,23 +48,37 @@ enum CodexScanner {
         return map
     }
 
-    /// Rollout files any currently-running Codex CLI process has open.
-    /// Filters out OpenAI's ChatGPT desktop app, which bundles its own
-    /// unrelated `codex`-named sandbox helper binaries — a real pitfall hit
-    /// during testing, not a hypothetical one.
+    /// Rollout files that reflect what the user is actually working in right
+    /// now, one per live Codex CLI process. Filters out OpenAI's ChatGPT
+    /// desktop app, which bundles its own unrelated `codex`-named sandbox
+    /// helper binaries — a real pitfall hit during testing, not a
+    /// hypothetical one.
     private static func currentlyOpenRolloutPaths() -> Set<String> {
         let candidates = ProcessInspector.runningProcesses().filter { proc in
             let exePath = proc.command.split(separator: " ").first.map(String.init) ?? proc.command
             return exePath.hasSuffix("/bin/codex") && !exePath.contains("/ChatGPT.app/")
         }
+        let fm = FileManager.default
         var paths: Set<String> = []
         for candidate in candidates {
             let open = ProcessInspector.openFilePaths(pid: candidate.pid)
-            for path in open where path.contains("/.codex/sessions/") && path.hasSuffix(".jsonl") {
-                paths.insert(path)
-            }
+                .filter { $0.contains("/.codex/sessions/") && $0.hasSuffix(".jsonl") }
+
+            // A single process can hold more than one rollout file open at
+            // once — observed in real testing (2026-07-27): a long-running
+            // codex process kept an old, no-longer-written rollout file open
+            // alongside the one it's actually using, and counting both
+            // inflated the active count (4 shown vs. 3 real sessions).
+            // Only the most recently modified file is what's actually live.
+            guard let latest = open.max(by: { mtime(of: $0, fm) < mtime(of: $1, fm) }) else { continue }
+            paths.insert(latest)
         }
         return paths
+    }
+
+    private static func mtime(of path: String, _ fm: FileManager) -> Date {
+        guard let attributes = try? fm.attributesOfItem(atPath: path) else { return .distantPast }
+        return attributes[.modificationDate] as? Date ?? .distantPast
     }
 
     private static func parseSession(at url: URL, threadNames: [String: String], isActive: Bool) -> SessionRecord? {
