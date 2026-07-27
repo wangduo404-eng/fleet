@@ -101,10 +101,13 @@ enum CodexScanner {
         let mtime = (attributes?[.modificationDate] as? Date) ?? Date()
 
         let contextUsage = lastTokenUsage(in: JSONLTail.tailLines(of: url))
+        let originator = payload["originator"] as? String
+        let origin: SessionOrigin = originator == "Codex Desktop" ? .desktopApp : .terminal
 
         return SessionRecord(
             id: sessionID,
             engine: .codex,
+            origin: origin,
             displayName: NameStore.shared.name(for: sessionID)
                 ?? threadNames[sessionID]
                 ?? ScannerSupport.fallbackName(projectPath: cwd, id: sessionID),

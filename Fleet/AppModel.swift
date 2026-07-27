@@ -16,6 +16,11 @@ final class AppModel: ObservableObject {
     @Published var sessions: [SessionRecord] = []
     @Published var statusFilter: StatusFilter = .all
     @Published var engineFilter: Engine?
+    // Defaults to hiding "Codex Desktop" (the ChatGPT desktop app's own
+    // Codex feature) — the user's actual intent was monitoring their own
+    // terminal, and on this machine 67% of Codex session files turned out
+    // to be Desktop-app automation, not terminal activity (2026-07-27).
+    @Published var originFilter: SessionOrigin? = .terminal
     @Published var searchText: String = ""
     @Published private(set) var isLoading = false
     @Published private(set) var lastSyncedAt: Date?
@@ -61,12 +66,13 @@ final class AppModel: ObservableObject {
             }
 
             let matchesEngine = engineFilter == nil || session.engine == engineFilter
+            let matchesOrigin = originFilter == nil || session.origin == originFilter
 
             let matchesSearch = searchText.isEmpty
                 || session.displayName.localizedCaseInsensitiveContains(searchText)
                 || session.projectPath.localizedCaseInsensitiveContains(searchText)
 
-            return matchesStatus && matchesEngine && matchesSearch
+            return matchesStatus && matchesEngine && matchesOrigin && matchesSearch
         }
     }
 
@@ -89,6 +95,10 @@ final class AppModel: ObservableObject {
 
     func count(for engine: Engine) -> Int {
         sessions.filter { $0.engine == engine }.count
+    }
+
+    func count(for origin: SessionOrigin) -> Int {
+        sessions.filter { $0.origin == origin }.count
     }
 
     /// Renames a session within Fleet only. Neither Claude Code nor Codex

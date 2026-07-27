@@ -15,6 +15,20 @@ enum SessionStatus: String, CaseIterable, Identifiable, Sendable {
     var id: String { rawValue }
 }
 
+/// Where a session actually came from. Confirmed via real data (2026-07-27):
+/// Codex's `session_meta.payload.originator` field distinguishes genuine
+/// terminal usage ("codex-tui", "codex_cli_rs") from sessions written by the
+/// ChatGPT desktop app's own bundled Codex feature ("Codex Desktop") — on
+/// this machine, 165 of 247 Codex session files (67%) were Desktop-app
+/// automation, not terminal activity. Claude Code has no equivalent
+/// desktop-app pollution today, so its sessions are always `.terminal`.
+enum SessionOrigin: String, CaseIterable, Identifiable, Sendable {
+    case terminal = "终端"
+    case desktopApp = "Codex Desktop App"
+
+    var id: String { rawValue }
+}
+
 /// Context-window usage for an active session.
 ///
 /// Claude Code's session files don't record the model's context window limit,
@@ -56,6 +70,7 @@ struct SessionRecord: Identifiable, Sendable {
 
     let id: String
     let engine: Engine
+    let origin: SessionOrigin
     var displayName: String
     let projectPath: String
     let isActive: Bool

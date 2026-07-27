@@ -55,6 +55,30 @@ struct SidebarView: View {
                 }
             }
 
+            Divider()
+                .overlay(Color.white.opacity(0.1))
+                .padding(.horizontal, 18)
+                .padding(.vertical, 12)
+
+            filterSection(title: "来源") {
+                filterRow(
+                    label: "全部来源",
+                    count: model.sessions.count,
+                    isSelected: model.originFilter == nil
+                ) {
+                    model.originFilter = nil
+                }
+                ForEach(SessionOrigin.allCases) { origin in
+                    filterRow(
+                        label: origin.rawValue,
+                        count: model.count(for: origin),
+                        isSelected: model.originFilter == origin
+                    ) {
+                        model.originFilter = origin
+                    }
+                }
+            }
+
             Spacer()
 
             Label("设置", systemImage: "gearshape")

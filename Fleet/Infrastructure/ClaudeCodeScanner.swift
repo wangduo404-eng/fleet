@@ -76,6 +76,7 @@ enum ClaudeCodeScanner {
         return SessionRecord(
             id: sessionID,
             engine: .claudeCode,
+            origin: .terminal,
             displayName: NameStore.shared.name(for: sessionID)
                 ?? ScannerSupport.fallbackName(projectPath: cwd, id: sessionID),
             projectPath: ScannerSupport.shortenedPath(cwd),
