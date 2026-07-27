@@ -12,10 +12,30 @@ enum StatusFilter: String, CaseIterable, Identifiable {
 
 @MainActor
 final class AppModel: ObservableObject {
-    @Published var sessions: [SessionRecord] = SessionRecord.mockData
+    @Published var sessions: [SessionRecord] = []
     @Published var statusFilter: StatusFilter = .all
     @Published var engineFilter: Engine?
     @Published var searchText: String = ""
+    @Published private(set) var isLoading = false
+    @Published private(set) var lastSyncedAt: Date?
+
+    /// Cold scan of both engines, off the main thread. Fleet doesn't run a
+    /// background process — this runs once per launch (see RootView), plus
+    /// whenever the caller explicitly wants a fresh snapshot.
+    func refresh() async {
+        isLoading = true
+        let scanned = await Task.detached(priority: .userInitiated) { () -> [SessionRecord] in
+            ClaudeCodeScanner.scan() + CodexScanner.scan()
+        }.value
+        sessions = scanned.sorted { $0.lastActiveAt > $1.lastActiveAt }
+        lastSyncedAt = Date()
+        isLoading = false
+    }
+
+    var syncStatusDescription: String {
+        guard let lastSyncedAt else { return "尚未同步" }
+        return "上次同步 \(chineseRelativeTime(from: lastSyncedAt, isActive: false))"
+    }
 
     var filteredSessions: [SessionRecord] {
         sessions.filter { session in
@@ -66,5 +86,6 @@ final class AppModel: ObservableObject {
     func rename(_ session: SessionRecord, to newName: String) {
         guard let index = sessions.firstIndex(where: { $0.id == session.id }) else { return }
         sessions[index].displayName = newName
+        NameStore.shared.setName(newName, for: session.id)
     }
 }

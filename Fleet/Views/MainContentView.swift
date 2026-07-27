@@ -63,7 +63,7 @@ struct MainContentView: View {
                     .font(FleetFont.brandTitle(20))
                     .foregroundStyle(FleetColor.mint)
             }
-            Text("上次同步 3 秒前 · 全部数据存储在本机")
+            Text("\(model.syncStatusDescription) · 全部数据存储在本机")
                 .font(.system(size: 12))
                 .foregroundStyle(.secondary)
         }
