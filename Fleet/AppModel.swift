@@ -11,9 +11,19 @@ enum StatusFilter: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+/// Home is a fixed "smart view" (à la Things' Today / Linear's Inbox) — not
+/// just the status filter set to `.active`. Selecting any row under
+/// "浏览全部 Session" switches into Browse so the sidebar never shows two
+/// contradictory selections at once (2026-07-27 design feedback).
+enum ViewMode {
+    case home
+    case browse
+}
+
 @MainActor
 final class AppModel: ObservableObject {
     @Published var sessions: [SessionRecord] = []
+    @Published var viewMode: ViewMode = .home
     @Published var statusFilter: StatusFilter = .all
     @Published var engineFilter: Engine?
     // Defaults to hiding "Codex Desktop" (the ChatGPT desktop app's own
@@ -82,6 +92,21 @@ final class AppModel: ObservableObject {
 
     var otherSessions: [SessionRecord] {
         filteredSessions.filter { $0.status != .active }
+    }
+
+    /// Home's criteria is fixed (active + terminal-origin), independent of
+    /// whatever the user has set under "浏览全部 Session" — it's a distinct
+    /// smart view, not a saved filter combination.
+    private var homeSessions: [SessionRecord] {
+        sessions.filter { $0.isActive && $0.origin == .terminal }
+    }
+
+    var homeClaudeSessions: [SessionRecord] {
+        homeSessions.filter { $0.engine == .claudeCode }
+    }
+
+    var homeCodexSessions: [SessionRecord] {
+        homeSessions.filter { $0.engine == .codex }
     }
 
     func count(for status: StatusFilter) -> Int {

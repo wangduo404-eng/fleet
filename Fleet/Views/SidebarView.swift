@@ -14,16 +14,28 @@ struct SidebarView: View {
                 .foregroundStyle(.white.opacity(0.5))
                 .padding(.horizontal, 18)
                 .padding(.top, 2)
-                .padding(.bottom, 20)
+                .padding(.bottom, 18)
+
+            homeNavItem
+                .padding(.horizontal, 10)
+                .padding(.bottom, 16)
+
+            Text("浏览全部 SESSION")
+                .font(.system(size: 10))
+                .tracking(1)
+                .foregroundStyle(.white.opacity(0.32))
+                .padding(.horizontal, 18)
+                .padding(.bottom, 8)
 
             filterSection(title: "状态") {
                 ForEach(StatusFilter.allCases) { status in
                     filterRow(
                         label: status.rawValue,
                         count: model.count(for: status),
-                        isSelected: model.statusFilter == status,
+                        isSelected: browsing && model.statusFilter == status,
                         dotColor: dotColor(for: status)
                     ) {
+                        model.viewMode = .browse
                         model.statusFilter = status
                     }
                 }
@@ -38,18 +50,20 @@ struct SidebarView: View {
                 filterRow(
                     label: "全部引擎",
                     count: model.sessions.count,
-                    isSelected: model.engineFilter == nil,
+                    isSelected: browsing && model.engineFilter == nil,
                     dotColor: nil
                 ) {
+                    model.viewMode = .browse
                     model.engineFilter = nil
                 }
                 ForEach(Engine.allCases) { engine in
                     filterRow(
                         label: engine.rawValue,
                         count: model.count(for: engine),
-                        isSelected: model.engineFilter == engine,
+                        isSelected: browsing && model.engineFilter == engine,
                         swatchColor: engine.accentColor
                     ) {
+                        model.viewMode = .browse
                         model.engineFilter = engine
                     }
                 }
@@ -64,16 +78,18 @@ struct SidebarView: View {
                 filterRow(
                     label: "全部来源",
                     count: model.sessions.count,
-                    isSelected: model.originFilter == nil
+                    isSelected: browsing && model.originFilter == nil
                 ) {
+                    model.viewMode = .browse
                     model.originFilter = nil
                 }
                 ForEach(SessionOrigin.allCases) { origin in
                     filterRow(
                         label: origin.rawValue,
                         count: model.count(for: origin),
-                        isSelected: model.originFilter == origin
+                        isSelected: browsing && model.originFilter == origin
                     ) {
+                        model.viewMode = .browse
                         model.originFilter = origin
                     }
                 }
@@ -90,6 +106,32 @@ struct SidebarView: View {
         .frame(width: 216, alignment: .leading)
         .frame(maxHeight: .infinity)
         .background(FleetColor.sidebarBackground)
+    }
+
+    private var browsing: Bool { model.viewMode == .browse }
+
+    private var homeNavItem: some View {
+        Button {
+            model.viewMode = .home
+        } label: {
+            HStack(spacing: 9) {
+                Image(systemName: "house.fill")
+                    .font(.system(size: 12))
+                Text("首页")
+                    .font(.system(size: 13.5, weight: .semibold))
+                Spacer()
+                Text("\(model.homeClaudeSessions.count + model.homeCodexSessions.count)")
+                    .font(.system(size: 11.5, weight: .semibold))
+                    .opacity(0.75)
+            }
+            .padding(8)
+            .foregroundStyle(model.viewMode == .home ? FleetColor.sidebarBackground : .white.opacity(0.6))
+            .background(
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(model.viewMode == .home ? FleetColor.mint : .clear)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     private var brand: some View {

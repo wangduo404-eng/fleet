@@ -42,6 +42,13 @@ struct ActiveSessionCard: View {
                 .font(FleetFont.mono(11))
                 .foregroundStyle(textColor.opacity(0.45))
 
+            // Pushes the action buttons to a shared bottom edge regardless
+            // of how much text sits above (context-usage line or not) —
+            // that, plus the fixed card height below, is what makes every
+            // card the same size (2026-07-27 design feedback: cards were
+            // reading as inconsistently sized).
+            Spacer(minLength: 0)
+
             HStack(spacing: 8) {
                 Button("复制命令") {
                     NSPasteboard.general.clearContents()
@@ -56,14 +63,14 @@ struct ActiveSessionCard: View {
             .padding(.top, 4)
         }
         .padding(14)
-        // `maxHeight: .infinity` here previously caused a real bug: inside a
-        // 2-column LazyVGrid with 3+ active cards (so 2 rows), it made a
-        // taller row-1 card (this one, with the extra context-usage line)
-        // try to fill *all* remaining scroll-view height rather than just
-        // its own row, visually overlapping into row 2's cards. A fixed
-        // minHeight covering the tallest content variant fixes the uneven
-        // heights within a row without that runaway expansion.
-        .frame(maxWidth: .infinity, minHeight: 200, alignment: .topLeading)
+        // A firm height (not `maxHeight: .infinity`, which previously caused
+        // a real bug: inside a 2-column LazyVGrid with 3+ cards, it made a
+        // taller card try to fill *all* remaining scroll-view height rather
+        // than just its own row, overlapping row 2). Every card is this
+        // exact height regardless of content, per 2026-07-27 feedback that
+        // cards should read as uniform, not "however tall the content is."
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+        .frame(height: 180)
         .background(cardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
