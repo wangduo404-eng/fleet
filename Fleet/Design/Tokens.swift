@@ -49,10 +49,18 @@ extension Engine {
         }
     }
 
-    var symbolName: String {
+    /// Official vector marks (not generic SF Symbols) — per V1's own design
+    /// doc, placeholder icons were always meant to be swapped for real
+    /// brand assets once past the prototype stage. Sourced from Wikimedia
+    /// Commons' mirrors of each company's own symbol (CC0/public-domain
+    /// file, though the mark itself remains their trademark — used here
+    /// only to identify "this is a Claude/Codex session," not as Fleet's
+    /// own branding). Imported as template-tintable symbol sets so they
+    /// take on `.foregroundStyle` like an SF Symbol would.
+    var logoImage: Image {
         switch self {
-        case .claudeCode: return "bubble.left.and.bubble.right"
-        case .codex: return "terminal"
+        case .claudeCode: return Image("ClaudeLogo")
+        case .codex: return Image("OpenAILogo")
         }
     }
 }

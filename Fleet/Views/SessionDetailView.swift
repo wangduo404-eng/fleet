@@ -8,8 +8,11 @@ struct SessionDetailView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 21) {
             HStack {
-                Image(systemName: session.engine.symbolName)
+                session.engine.logoImage
+                    .resizable()
+                    .scaledToFit()
                     .foregroundStyle(session.engine.accentColor)
+                    .frame(width: 16, height: 16)
                 Text(session.engine.rawValue)
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(session.engine.accentColor)

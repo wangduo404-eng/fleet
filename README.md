@@ -31,4 +31,11 @@ xcodebuild -project Fleet.xcodeproj -scheme Fleet -configuration Debug build
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](./LICENSE)（仅覆盖本项目代码；不适用于下方第三方商标素材）
+
+## 第三方商标声明
+
+Session 卡片中的 Claude / OpenAI 图标为对应公司的官方商标，仅用于标识对应引擎，不代表 Anthropic / OpenAI 对本项目的背书或关联。矢量图取自 Wikimedia Commons 镜像文件：
+
+- Claude：[`File:Claude_AI_symbol.svg`](https://commons.wikimedia.org/wiki/File:Claude_AI_symbol.svg)（CC0）
+- OpenAI：[`File:OpenAI_logo_2025_(symbol).svg`](https://commons.wikimedia.org/wiki/File:OpenAI_logo_2025_(symbol).svg)（形状为公有领域，商标权仍归 OpenAI 所有）

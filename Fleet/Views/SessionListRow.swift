@@ -7,9 +7,11 @@ struct SessionListRow: View {
 
     var body: some View {
         HStack(spacing: 13) {
-            Image(systemName: session.engine.symbolName)
-                .font(.system(size: 15))
+            session.engine.logoImage
+                .resizable()
+                .scaledToFit()
                 .foregroundStyle(session.engine.accentColor)
+                .frame(width: 17, height: 17)
                 .frame(width: 20)
 
             VStack(alignment: .leading, spacing: 2) {

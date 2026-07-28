@@ -90,9 +90,11 @@ struct ActiveSessionCard: View {
                 .fill(session.engine.accentColor)
                 .frame(width: 24, height: 24)
                 .overlay(
-                    Image(systemName: session.engine.symbolName)
-                        .font(.system(size: 13, weight: .medium))
+                    session.engine.logoImage
+                        .resizable()
+                        .scaledToFit()
                         .foregroundStyle(.white)
+                        .frame(width: 13, height: 13)
                 )
             Text(session.engine.rawValue)
                 .font(.system(size: 17, weight: .semibold))
