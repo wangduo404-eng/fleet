@@ -6,7 +6,7 @@ Mac 端菜单栏工具，扫描并展示本机 **Claude Code** / **Codex** 的�
 
 ## 下载
 
-[下载最新版 DMG](https://github.com/wangduo404-eng/fleet/releases/latest/download/Fleet-1.0.dmg) · [查看全部 Releases](https://github.com/wangduo404-eng/fleet/releases)
+[前往最新 Release 下载 DMG](https://github.com/wangduo404-eng/fleet/releases/latest)
 
 ## 功能
 
