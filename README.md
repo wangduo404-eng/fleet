@@ -4,6 +4,10 @@ Mac 端菜单栏工具，扫描并展示本机 **Claude Code** / **Codex** 的�
 
 ![Fleet 首页：正在航行的船队](./docs/screenshots/home.png)
 
+## 下载
+
+[下载最新版 DMG](https://github.com/wangduo404-eng/fleet/releases/latest/download/Fleet-1.0.dmg) · [查看全部 Releases](https://github.com/wangduo404-eng/fleet/releases)
+
 ## 功能
 
 - **首页**：只显示当前活跃、来自终端的 session，Claude Code 和 Codex 分栏展示，上下文占用、记录大小、总轮次一眼看到。
