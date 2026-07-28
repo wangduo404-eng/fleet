@@ -36,6 +36,19 @@ final class AppModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var lastSyncedAt: Date?
 
+    private static let firstLaunchAcknowledgedKey = "hasAcknowledgedFirstLaunchNotice"
+
+    /// Whether the one-time "here's what this reads" notice has been shown
+    /// and dismissed — gates the very first scan (see RootView), so a new
+    /// user sees it before their session history appears, not after.
+    @Published private(set) var hasAcknowledgedFirstLaunch =
+        UserDefaults.standard.bool(forKey: AppModel.firstLaunchAcknowledgedKey)
+
+    func acknowledgeFirstLaunch() {
+        hasAcknowledgedFirstLaunch = true
+        UserDefaults.standard.set(true, forKey: AppModel.firstLaunchAcknowledgedKey)
+    }
+
     /// Cold scan of both engines, off the main thread. Fleet doesn't run a
     /// background process — this runs once per launch (see RootView), plus
     /// whenever the caller explicitly wants a fresh snapshot.
