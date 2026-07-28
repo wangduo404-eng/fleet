@@ -51,7 +51,7 @@ struct ContextUsage: Sendable {
 
     var description: String {
         let used = Self.format(usedTokens)
-        guard let windowTokens else {
+        guard let windowTokens, windowTokens > 0 else {
             return "≈\(used) tokens"
         }
         let percent = Int((Double(usedTokens) / Double(windowTokens) * 100).rounded())
