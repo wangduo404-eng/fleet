@@ -11,7 +11,7 @@ struct BookmarksView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 26) {
                 header
 
                 if model.bookmarkedSessions.isEmpty {
@@ -31,7 +31,7 @@ struct BookmarksView: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(24)
+            .padding(32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .sheet(item: $selectedSession) { session in
@@ -41,27 +41,27 @@ struct BookmarksView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 5) {
             Text("书签")
-                .font(FleetFont.brandTitle(27))
+                .font(FleetFont.brandTitle(35))
             Text("手动标记过、之后还想找回来的 session")
-                .font(.system(size: 12))
+                .font(.system(size: 15.5))
                 .foregroundStyle(.secondary)
         }
     }
 
     private var emptyState: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 11) {
             Image(systemName: "bookmark")
-                .font(.system(size: 22))
+                .font(.system(size: 29))
                 .foregroundStyle(.tertiary)
             Text("还没有书签")
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 17, weight: .medium))
             Text("在任意 session 上点书签图标，关掉终端后也能在这里找到它")
-                .font(.system(size: 12))
+                .font(.system(size: 15.5))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 60)
+        .padding(.top, 80)
     }
 }

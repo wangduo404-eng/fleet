@@ -11,54 +11,54 @@ struct HomeView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 26) {
                 header
 
-                HStack(alignment: .top, spacing: 20) {
+                HStack(alignment: .top, spacing: 26) {
                     engineColumn(title: "Claude Code", accent: FleetColor.claudeAccent, sessions: model.homeClaudeSessions)
                     engineColumn(title: "Codex", accent: FleetColor.codexAccent, sessions: model.homeCodexSessions)
                 }
 
                 Spacer(minLength: 0)
             }
-            .padding(24)
+            .padding(32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .firstTextBaseline) {
                 Text("正在运行的船队")
-                    .font(FleetFont.brandTitle(27))
+                    .font(FleetFont.brandTitle(35))
                 Spacer()
                 Text("\(model.homeClaudeSessions.count + model.homeCodexSessions.count) 艘")
-                    .font(FleetFont.brandTitle(20))
+                    .font(FleetFont.brandTitle(26))
                     .foregroundStyle(FleetColor.mint)
             }
             Text("\(model.syncStatusDescription) · 只显示当前活跃的 session")
-                .font(.system(size: 12))
+                .font(.system(size: 15.5))
                 .foregroundStyle(.secondary)
         }
     }
 
     private func engineColumn(title: String, accent: Color, sessions: [SessionRecord]) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 7) {
-                RoundedRectangle(cornerRadius: 3, style: .continuous)
+        VStack(alignment: .leading, spacing: 13) {
+            HStack(spacing: 9) {
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
                     .fill(accent)
-                    .frame(width: 11, height: 11)
+                    .frame(width: 14, height: 14)
                 Text(title)
-                    .font(.system(size: 12.5, weight: .semibold))
+                    .font(.system(size: 16.5, weight: .semibold))
                 Text("\(sessions.count)")
-                    .font(.system(size: 12))
+                    .font(.system(size: 15.5))
                     .foregroundStyle(.secondary)
             }
 
             if sessions.isEmpty {
                 emptyPlaceholder
             } else {
-                VStack(spacing: 12) {
+                VStack(spacing: 16) {
                     ForEach(sessions) { session in
                         ActiveSessionCard(session: session)
                     }
@@ -69,12 +69,12 @@ struct HomeView: View {
     }
 
     private var emptyPlaceholder: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .stroke(Color.primary.opacity(0.12), style: StrokeStyle(lineWidth: 1.5, dash: [4, 4]))
-            .frame(height: 90)
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .stroke(Color.primary.opacity(0.12), style: StrokeStyle(lineWidth: 2, dash: [5, 5]))
+            .frame(height: 120)
             .overlay(
                 Text("当前没有运行中的 session")
-                    .font(.system(size: 12.5))
+                    .font(.system(size: 16.5))
                     .foregroundStyle(.secondary)
             )
     }

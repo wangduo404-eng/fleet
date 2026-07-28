@@ -11,10 +11,15 @@ enum FleetColor {
     static let claudeCardBackground = Color(hex: 0xF7E9E2)
     static let claudeCardText = Color(hex: 0x7A3B22)
 
-    /// OpenAI's brand teal (used for Codex, OpenAI's CLI product).
-    static let codexAccent = Color(hex: 0x10A37F)
-    static let codexCardBackground = Color(hex: 0xDFF3EC)
-    static let codexCardText = Color(hex: 0x0B6B54)
+    /// Deliberately NOT OpenAI's official #10A37F green — verified that's
+    /// still their real brand color (2026-07-28 web search), but Fleet's
+    /// own "active" status dot is already a mint-green (`mint` above), so
+    /// a same-family green for the Codex engine made "this is Codex" and
+    /// "this is active" blend together. Blue reads clearly distinct from
+    /// both Claude's orange and the active indicator.
+    static let codexAccent = Color(hex: 0x2F6FE4)
+    static let codexCardBackground = Color(hex: 0xE7EEFB)
+    static let codexCardText = Color(hex: 0x1C3D6E)
 
     static let idle = Color(hex: 0x888780)
     static let expired = Color(hex: 0xEF9F27)

@@ -19,13 +19,13 @@ struct MainContentView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 26) {
                 header
 
                 searchField
 
                 if !model.activeSessions.isEmpty {
-                    LazyVGrid(columns: columns, spacing: 12) {
+                    LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(model.activeSessions) { session in
                             ActiveSessionCard(session: session)
                         }
@@ -35,10 +35,10 @@ struct MainContentView: View {
                 if !recentOtherSessions.isEmpty {
                     VStack(alignment: .leading, spacing: 0) {
                         Text("其他 SESSION")
-                            .font(.system(size: 10.5))
-                            .tracking(0.8)
+                            .font(.system(size: 13.5))
+                            .tracking(1)
                             .foregroundStyle(.secondary)
-                            .padding(.bottom, 6)
+                            .padding(.bottom, 8)
 
                         sessionRows(recentOtherSessions)
                     }
@@ -49,17 +49,17 @@ struct MainContentView: View {
                         Button {
                             showOlderSessions.toggle()
                         } label: {
-                            HStack(spacing: 4) {
+                            HStack(spacing: 5) {
                                 Image(systemName: showOlderSessions ? "chevron.down" : "chevron.right")
-                                    .font(.system(size: 9, weight: .semibold))
+                                    .font(.system(size: 12, weight: .semibold))
                                 Text("一个月前的 SESSION（\(olderOtherSessions.count)）")
-                                    .font(.system(size: 10.5))
-                                    .tracking(0.8)
+                                    .font(.system(size: 13.5))
+                                    .tracking(1)
                             }
                             .foregroundStyle(.secondary)
                         }
                         .buttonStyle(.plain)
-                        .padding(.bottom, 6)
+                        .padding(.bottom, 8)
 
                         if showOlderSessions {
                             sessionRows(olderOtherSessions)
@@ -69,7 +69,7 @@ struct MainContentView: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(24)
+            .padding(32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .sheet(item: $selectedSession) { session in
@@ -79,17 +79,17 @@ struct MainContentView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .firstTextBaseline) {
                 Text("正在运行的船队")
-                    .font(FleetFont.brandTitle(27))
+                    .font(FleetFont.brandTitle(35))
                 Spacer()
                 Text("\(model.activeSessions.count) / \(model.sessions.count) 艘")
-                    .font(FleetFont.brandTitle(20))
+                    .font(FleetFont.brandTitle(26))
                     .foregroundStyle(FleetColor.mint)
             }
             Text("\(model.syncStatusDescription) · 全部数据存储在本机")
-                .font(.system(size: 12))
+                .font(.system(size: 15.5))
                 .foregroundStyle(.secondary)
         }
     }
@@ -108,18 +108,19 @@ struct MainContentView: View {
     }
 
     private var searchField: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
             TextField("搜索 session、项目或路径...", text: $model.searchText)
                 .textFieldStyle(.plain)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
+        .font(.system(size: 15))
+        .padding(.horizontal, 13)
+        .padding(.vertical, 10)
         .background(Color(nsColor: .textBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .stroke(Color.primary.opacity(0.1))
         )
     }
