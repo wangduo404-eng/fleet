@@ -18,8 +18,8 @@ targets:
       path: Fleet/Info.plist
       properties:
         LSUIElement: true
-        CFBundleShortVersionString: "0.1.0"
-        CFBundleVersion: "1"
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "2"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.yafo.Fleet
