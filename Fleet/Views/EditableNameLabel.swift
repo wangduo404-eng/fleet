@@ -38,10 +38,10 @@ struct EditableNameLabel: View {
                 }
             } label: {
                 Image(systemName: isEditing ? "checkmark" : "pencil")
-                    .font(.system(size: 10))
+                    .font(.system(size: 13, weight: .semibold))
             }
             .buttonStyle(.plain)
-            .foregroundStyle(textColor.opacity(0.5))
+            .foregroundStyle(textColor.opacity(0.85))
         }
     }
 
