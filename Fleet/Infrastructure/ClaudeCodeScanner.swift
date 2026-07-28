@@ -2,7 +2,6 @@ import Foundation
 
 /// Scans `~/.claude/projects/**/*.jsonl` for session history, and
 /// `~/.claude/sessions/*.json` for the currently-active-process registry.
-/// See session-tracker-需求文档.md 4.1/4.2 for the underlying research.
 enum ClaudeCodeScanner {
     static func scan() -> [SessionRecord] {
         let fm = FileManager.default

@@ -45,7 +45,6 @@ enum SessionOrigin: String, CaseIterable, Identifiable, Sendable {
 /// Claude Code's session files don't record the model's context window limit,
 /// so only an approximate token count can be shown. Codex's `token_count`
 /// events include `model_context_window`, so an exact percentage is possible.
-/// See session-tracker-需求文档.md 4.1 for the underlying research.
 struct ContextUsage: Sendable {
     let usedTokens: Int
     let windowTokens: Int?

@@ -151,9 +151,8 @@ final class AppModel: ObservableObject {
 
     /// Renames a session within Fleet only. Neither Claude Code nor Codex
     /// expose a safe way for an external tool to persist a display name back
-    /// into their own session records (see session-tracker-需求文档.md 3.2),
-    /// so this does not touch `~/.claude` or `~/.codex` — it only updates
-    /// Fleet's own in-memory record.
+    /// into their own session records, so this does not touch `~/.claude` or
+    /// `~/.codex` — it only updates Fleet's own in-memory record.
     func rename(_ session: SessionRecord, to newName: String) {
         guard let index = sessions.firstIndex(where: { $0.id == session.id }) else { return }
         sessions[index].displayName = newName

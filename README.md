@@ -23,7 +23,6 @@ Mac 端菜单栏工具，扫描并展示本机 **Claude Code** / **Codex** 的�
 
 原生 SwiftUI，独立菜单栏 App（`LSUIElement`，无 Dock 图标），不常驻后台、不轮询——启动时扫描一次，之后闲置直到下次打开。
 
-- 需求与技术调研：[session-tracker-需求文档.md](./session-tracker-需求文档.md)
 - UI 设计稿：[V1](./Fleet-设计稿V1.md)（当前采用）· [V2](./Fleet-设计稿V2.md) · [V3](./Fleet-设计稿V3.md)
 
 ## 开发

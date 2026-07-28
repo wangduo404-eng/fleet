@@ -6,10 +6,9 @@ import Foundation
 /// it's an accelerator, not the source of truth. 2026-07-27 testing found
 /// it can lag behind or miss sessions created via `codex exec`, so the
 /// session list itself always comes from scanning the rollout files
-/// directly. See session-tracker-需求文档.md 4.2 for the full research,
-/// including the caveat that a brand-new session has no rollout file at all
-/// until its first turn completes (sqlite state files exist before that,
-/// but aren't useful for Fleet's purposes).
+/// directly. A brand-new session has no rollout file at all until its first
+/// turn completes (sqlite state files exist before that, but aren't useful
+/// for Fleet's purposes).
 enum CodexScanner {
     static func scan() -> [SessionRecord] {
         let fm = FileManager.default

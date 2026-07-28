@@ -2,9 +2,8 @@ import Foundation
 
 /// Fleet's own session_id -> custom display name mapping. Neither Claude
 /// Code nor Codex expose a safe way for an external tool to persist a name
-/// back into their own session records (session-tracker-需求文档.md 3.2),
-/// so this overlay lives entirely in Fleet's own file and never touches
-/// `~/.claude` or `~/.codex`.
+/// back into their own session records, so this overlay lives entirely in
+/// Fleet's own file and never touches `~/.claude` or `~/.codex`.
 final class NameStore: @unchecked Sendable {
     static let shared = NameStore()
 

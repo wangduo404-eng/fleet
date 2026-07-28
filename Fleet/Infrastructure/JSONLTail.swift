@@ -2,7 +2,7 @@ import Foundation
 
 /// Reads small head/tail slices of a (potentially very large) JSONL file
 /// without loading the whole file into memory — Claude Code session files
-/// can be 17MB+/40k lines (see session-tracker-需求文档.md 4.1/5).
+/// can be 17MB+/40k lines.
 enum JSONLTail {
     static func headLines(of url: URL, maxLines: Int = 5, maxBytes: Int = 8192) -> [String] {
         guard let handle = try? FileHandle(forReadingFrom: url) else { return [] }
