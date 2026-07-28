@@ -19,13 +19,12 @@ enum CodexScanner {
         }
 
         let threadNames = readThreadNames()
-        let activeRolloutPaths = currentlyOpenRolloutPaths()
+        let activeSessionIDs = currentlyActiveSessionIDs()
 
         var results: [SessionRecord] = []
         for case let url as URL in enumerator {
             guard url.lastPathComponent.hasPrefix("rollout-"), url.pathExtension == "jsonl" else { continue }
-            let isActive = activeRolloutPaths.contains(url.standardizedFileURL.path)
-            if let record = parseSession(at: url, threadNames: threadNames, isActive: isActive) {
+            if let record = parseSession(at: url, threadNames: threadNames, activeSessionIDs: activeSessionIDs) {
                 results.append(record)
             }
         }
@@ -48,32 +47,47 @@ enum CodexScanner {
         return map
     }
 
-    /// Rollout files that reflect what the user is actually working in right
-    /// now, one per live Codex CLI process. Filters out OpenAI's ChatGPT
-    /// desktop app, which bundles its own unrelated `codex`-named sandbox
-    /// helper binaries — a real pitfall hit during testing, not a
-    /// hypothetical one.
-    private static func currentlyOpenRolloutPaths() -> Set<String> {
+    /// Resolves to the *root* session id currently being worked on by each
+    /// live Codex CLI process — not a set of file paths. Filters out
+    /// OpenAI's ChatGPT desktop app, which bundles its own unrelated
+    /// `codex`-named sandbox helper binaries — a real pitfall hit during
+    /// testing, not a hypothetical one.
+    ///
+    /// A single Codex process can have many rollout files open at once: one
+    /// per subagent it has spawned, alongside the root conversation file
+    /// (real-machine testing 2026-07-28: 207 of 290 rollout files on this
+    /// machine are subagent threads, not user-facing sessions). All of them
+    /// share the same `session_meta.payload.session_id` — the root's id —
+    /// even though each subagent file's own `payload.id` differs. Picking
+    /// "whichever open file has the latest mtime" and treating *that file's
+    /// own path* as the active identity (the original approach) breaks as
+    /// soon as a subagent file happens to be the most recently written one:
+    /// the session shown as active ends up being that tiny subagent
+    /// snippet — wrong turn count, wrong context usage — instead of the
+    /// actual root conversation the user is watching. Resolving to the
+    /// *session id* first (root id for both root and subagent files) fixes
+    /// this: activity from any of a process's open files, root or subagent,
+    /// correctly marks the root session as active.
+    private static func currentlyActiveSessionIDs() -> Set<String> {
         let candidates = ProcessInspector.runningProcesses().filter { proc in
             let exePath = proc.command.split(separator: " ").first.map(String.init) ?? proc.command
             return exePath.hasSuffix("/bin/codex") && !exePath.contains("/ChatGPT.app/")
         }
         let fm = FileManager.default
-        var paths: Set<String> = []
+        var ids: Set<String> = []
         for candidate in candidates {
             let open = ProcessInspector.openFilePaths(pid: candidate.pid)
                 .filter { $0.contains("/.codex/sessions/") && $0.hasSuffix(".jsonl") }
 
-            // A single process can hold more than one rollout file open at
-            // once — observed in real testing (2026-07-27): a long-running
-            // codex process kept an old, no-longer-written rollout file open
-            // alongside the one it's actually using, and counting both
-            // inflated the active count (4 shown vs. 3 real sessions).
-            // Only the most recently modified file is what's actually live.
-            guard let latest = open.max(by: { mtime(of: $0, fm) < mtime(of: $1, fm) }) else { continue }
-            paths.insert(latest)
+            // Among a process's currently-open rollout files, only the most
+            // recently modified one reflects what it's actually doing right
+            // now (older open files can be stale fds left over from a prior
+            // session switch — see 2026-07-27 finding above).
+            guard let latest = open.max(by: { mtime(of: $0, fm) < mtime(of: $1, fm) }),
+                  let sessionID = resolvedSessionID(at: URL(fileURLWithPath: latest)) else { continue }
+            ids.insert(sessionID)
         }
-        return paths
+        return ids
     }
 
     private static func mtime(of path: String, _ fm: FileManager) -> Date {
@@ -81,7 +95,14 @@ enum CodexScanner {
         return attributes[.modificationDate] as? Date ?? .distantPast
     }
 
-    private static func parseSession(at url: URL, threadNames: [String: String], isActive: Bool) -> SessionRecord? {
+    private static func resolvedSessionID(at url: URL) -> String? {
+        let headLines = JSONLTail.headLines(of: url, maxLines: 3, maxBytes: 262_144)
+        guard let meta = firstJSON(in: headLines, whereType: "session_meta"),
+              let payload = meta["payload"] as? [String: Any] else { return nil }
+        return (payload["session_id"] as? String) ?? (payload["id"] as? String)
+    }
+
+    private static func parseSession(at url: URL, threadNames: [String: String], activeSessionIDs: Set<String>) -> SessionRecord? {
         // `session_meta`'s line embeds the full system prompt
         // (`base_instructions.text`), which alone runs 15-22KB on a regular
         // interactive session — comfortably over a "small head read" budget.
@@ -95,6 +116,15 @@ enum CodexScanner {
               let sessionID = (payload["session_id"] as? String) ?? (payload["id"] as? String),
               let cwd = payload["cwd"] as? String else { return nil }
 
+        // Subagent threads (spawned automatically by Codex's own multi-agent
+        // orchestration, not something the user directly runs or resumes)
+        // share the root's session_id, so without this they'd show up as
+        // extra cards/rows carrying the *root's* id — a duplicate-id
+        // collision, not a distinct session. Skip them; the root file
+        // already represents this session on its own.
+        if payload["thread_source"] as? String == "subagent" { return nil }
+
+        let isActive = activeSessionIDs.contains(sessionID)
         let fm = FileManager.default
         let attributes = try? fm.attributesOfItem(atPath: url.path)
         let sizeBytes = (attributes?[.size] as? Int64) ?? Int64((attributes?[.size] as? Int) ?? 0)
