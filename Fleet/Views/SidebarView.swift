@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct SidebarView: View {
@@ -81,11 +82,28 @@ struct SidebarView: View {
 
             Spacer()
 
-            Text(versionString)
-                .font(.system(size: 12))
-                .foregroundStyle(.white.opacity(0.32))
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+            HStack {
+                Text(versionString)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.white.opacity(0.32))
+
+                Spacer()
+
+                Button {
+                    NSApp.terminate(nil)
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "power")
+                        Text("退出")
+                    }
+                    .font(.system(size: 12))
+                    .foregroundStyle(.white.opacity(0.45))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("退出 Fleet")
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 24)
         }
         .frame(width: 282, alignment: .leading)
         .frame(maxHeight: .infinity)
