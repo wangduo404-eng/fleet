@@ -80,6 +80,12 @@ struct SidebarView: View {
             }
 
             Spacer()
+
+            Text(versionString)
+                .font(.system(size: 12))
+                .foregroundStyle(.white.opacity(0.32))
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
         }
         .frame(width: 282, alignment: .leading)
         .frame(maxHeight: .infinity)
@@ -87,6 +93,11 @@ struct SidebarView: View {
     }
 
     private var browsing: Bool { model.viewMode == .browse }
+
+    private var versionString: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+        return "v\(version)"
+    }
 
     private func primaryNavItem(icon: String, label: String, count: Int, mode: ViewMode) -> some View {
         let isOn = model.viewMode == mode
