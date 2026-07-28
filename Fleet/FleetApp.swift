@@ -17,7 +17,11 @@ struct FleetApp: App {
                 // actual dark theme designed (2026-07-27 feedback).
                 .preferredColorScheme(.light)
         }
-        .defaultSize(width: 900, height: 600)
+        // ~35% bigger than the original 900x600 — the whole app window felt
+        // small with real content in it, not just an individual card
+        // (2026-07-28 feedback, clarifying an earlier "make it bigger" ask
+        // that got misapplied to the session cards instead).
+        .defaultSize(width: 1220, height: 810)
         .windowResizability(.contentSize)
     }
 }

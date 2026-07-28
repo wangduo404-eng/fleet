@@ -18,7 +18,7 @@ struct RootView: View {
             }
             .background(Color(nsColor: .windowBackgroundColor))
         }
-        .frame(minWidth: 820, minHeight: 560)
+        .frame(minWidth: 1100, minHeight: 750)
         .task {
             await model.refresh()
         }
