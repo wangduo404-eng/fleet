@@ -12,7 +12,6 @@ Mac 端菜单栏工具，扫描并展示本机 **Claude Code** / **Codex** 的�
 - **重命名**：在 Fleet 里给 session 起个好记的名字，本地持久化，重开也不会丢。
 - **一键复制恢复命令**：`claude --resume <id>` / `codex resume <id>`，粘到终端就能接着聊。
 
-
 ## 数据处理说明
 
 - 只读取本机 `~/.claude` 和 `~/.codex` 目录下的 session 记录——项目路径、活跃状态、上下文占用等，用来在这里展示。
