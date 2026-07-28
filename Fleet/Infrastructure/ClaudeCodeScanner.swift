@@ -72,7 +72,12 @@ enum ClaudeCodeScanner {
         let mtime = (attributes?[.modificationDate] as? Date) ?? Date()
 
         let contextUsage = lastAssistantUsage(in: JSONLTail.tailLines(of: url))
-        let turnCount = JSONLTail.occurrenceCount(of: "\"subtype\":\"turn_duration\"", in: url)
+        let isActive = activePIDs.contains(sessionID)
+        // Full-file scan is real I/O (Claude session files can run 17MB+) —
+        // only worth paying for the handful of active sessions Home actually
+        // displays a turn count for. SessionDetailView computes it lazily
+        // for historical sessions when opened.
+        let turnCount = isActive ? JSONLTail.occurrenceCount(of: Engine.claudeCode.turnCompletionMarker, in: url) : nil
 
         return SessionRecord(
             id: sessionID,
@@ -81,7 +86,8 @@ enum ClaudeCodeScanner {
             displayName: NameStore.shared.name(for: sessionID)
                 ?? ScannerSupport.fallbackName(projectPath: cwd, id: sessionID),
             projectPath: ScannerSupport.shortenedPath(cwd),
-            isActive: activePIDs.contains(sessionID),
+            fileURL: url,
+            isActive: isActive,
             lastActiveAt: mtime,
             fileSizeBytes: sizeBytes,
             contextUsage: contextUsage,

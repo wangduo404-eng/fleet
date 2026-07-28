@@ -4,6 +4,13 @@ struct SessionDetailView: View {
     let session: SessionRecord
     @EnvironmentObject private var model: AppModel
     @Environment(\.dismiss) private var dismiss
+    @State private var lazyTurnCount: Int?
+
+    /// The active-session bulk scan already paid for a real count; for a
+    /// historical session it's computed here, on demand, for just this one
+    /// file — instead of every session in "浏览全部" paying a full-file scan
+    /// up front for a number only shown when someone actually opens it.
+    private var displayedTurnCount: Int? { session.turnCount ?? lazyTurnCount }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 21) {
@@ -46,7 +53,7 @@ struct SessionDetailView: View {
                 detailRow(label: "项目路径", value: session.projectPath, mono: true)
                 detailRow(label: "最近活跃", value: session.lastActiveDescription)
                 detailRow(label: "记录大小", value: session.recordSizeDescription)
-                detailRow(label: "总轮次", value: "\(session.turnCount) 轮")
+                detailRow(label: "总轮次", value: displayedTurnCount.map { "\($0) 轮" } ?? "统计中…")
                 if let contextUsage = session.contextUsage {
                     detailRow(label: "上下文占用", value: contextUsage.description)
                 }
@@ -77,6 +84,14 @@ struct SessionDetailView: View {
         }
         .padding(27)
         .frame(width: 565)
+        .task(id: session.id) {
+            guard session.turnCount == nil else { return }
+            let marker = session.engine.turnCompletionMarker
+            let url = session.fileURL
+            lazyTurnCount = await Task.detached(priority: .utility) {
+                JSONLTail.occurrenceCount(of: marker, in: url)
+            }.value
+        }
     }
 
     private var statusBadge: some View {

@@ -133,7 +133,11 @@ enum CodexScanner {
         let contextUsage = lastTokenUsage(in: JSONLTail.tailLines(of: url))
         let originator = payload["originator"] as? String
         let origin: SessionOrigin = originator == "Codex Desktop" ? .desktopApp : .terminal
-        let turnCount = JSONLTail.occurrenceCount(of: "\"type\":\"task_complete\"", in: url)
+        // Full-file scan is real I/O (rollout files can run 100MB+) — only
+        // worth paying for the handful of active sessions Home actually
+        // displays a turn count for. SessionDetailView computes it lazily
+        // for historical sessions when opened.
+        let turnCount = isActive ? JSONLTail.occurrenceCount(of: Engine.codex.turnCompletionMarker, in: url) : nil
 
         return SessionRecord(
             id: sessionID,
@@ -143,6 +147,7 @@ enum CodexScanner {
                 ?? threadNames[sessionID]
                 ?? ScannerSupport.fallbackName(projectPath: cwd, id: sessionID),
             projectPath: ScannerSupport.shortenedPath(cwd),
+            fileURL: url,
             isActive: isActive,
             lastActiveAt: mtime,
             fileSizeBytes: sizeBytes,

@@ -5,6 +5,17 @@ enum Engine: String, CaseIterable, Identifiable, Sendable {
     case codex = "Codex"
 
     var id: String { rawValue }
+
+    /// The literal JSON substring marking one completed conversation turn in
+    /// this engine's own session file format — shared by the bulk scanners
+    /// and SessionDetailView's on-demand recompute (see JSONLTail.occurrenceCount)
+    /// so both use exactly the same definition of "a turn."
+    var turnCompletionMarker: String {
+        switch self {
+        case .claudeCode: return "\"subtype\":\"turn_duration\""
+        case .codex: return "\"type\":\"task_complete\""
+        }
+    }
 }
 
 enum SessionStatus: String, CaseIterable, Identifiable, Sendable {
@@ -73,13 +84,18 @@ struct SessionRecord: Identifiable, Sendable {
     let origin: SessionOrigin
     var displayName: String
     let projectPath: String
+    let fileURL: URL
     let isActive: Bool
     let lastActiveAt: Date
     let fileSizeBytes: Int64
     let contextUsage: ContextUsage?
-    /// Completed conversation turns — Claude Code's `system`/`turn_duration`
-    /// events and Codex's `event_msg`/`task_complete` events respectively.
-    let turnCount: Int
+    /// Completed conversation turns. `nil` means "not computed yet" — the
+    /// bulk scan only pays the full-file-scan cost for active sessions
+    /// (the only ones shown on Home), since historical sessions in "浏览全部"
+    /// never display a turn count in list form; SessionDetailView computes
+    /// it on demand for whichever single historical session gets opened,
+    /// instead of every session in the corpus paying that cost up front.
+    let turnCount: Int?
     let resumeCommand: String
     var isBookmarked: Bool
 
