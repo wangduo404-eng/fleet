@@ -103,6 +103,7 @@ enum CodexScanner {
         let contextUsage = lastTokenUsage(in: JSONLTail.tailLines(of: url))
         let originator = payload["originator"] as? String
         let origin: SessionOrigin = originator == "Codex Desktop" ? .desktopApp : .terminal
+        let turnCount = JSONLTail.occurrenceCount(of: "\"type\":\"task_complete\"", in: url)
 
         return SessionRecord(
             id: sessionID,
@@ -116,6 +117,7 @@ enum CodexScanner {
             lastActiveAt: mtime,
             fileSizeBytes: sizeBytes,
             contextUsage: contextUsage,
+            turnCount: turnCount,
             resumeCommand: "codex resume \(sessionID)",
             isBookmarked: BookmarkStore.shared.isBookmarked(sessionID)
         )

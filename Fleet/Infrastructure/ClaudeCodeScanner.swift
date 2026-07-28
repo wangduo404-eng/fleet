@@ -72,6 +72,7 @@ enum ClaudeCodeScanner {
         let mtime = (attributes?[.modificationDate] as? Date) ?? Date()
 
         let contextUsage = lastAssistantUsage(in: JSONLTail.tailLines(of: url))
+        let turnCount = JSONLTail.occurrenceCount(of: "\"subtype\":\"turn_duration\"", in: url)
 
         return SessionRecord(
             id: sessionID,
@@ -84,6 +85,7 @@ enum ClaudeCodeScanner {
             lastActiveAt: mtime,
             fileSizeBytes: sizeBytes,
             contextUsage: contextUsage,
+            turnCount: turnCount,
             resumeCommand: "claude --resume \(sessionID)",
             isBookmarked: BookmarkStore.shared.isBookmarked(sessionID)
         )

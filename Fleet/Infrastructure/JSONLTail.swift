@@ -28,4 +28,35 @@ enum JSONLTail {
               let text = String(data: data, encoding: .utf8) else { return [] }
         return text.split(separator: "\n", omittingEmptySubsequences: true).map(String.init)
     }
+
+    /// Counts occurrences of a literal byte marker across the whole file,
+    /// reading in fixed-size chunks rather than loading the file into memory
+    /// — needed because turn/task markers can appear anywhere in the file,
+    /// not just the head/tail, and Codex rollout files can exceed 100MB.
+    /// A `(marker.count - 1)`-byte carry across chunk boundaries catches
+    /// matches split by a chunk edge without double-counting (any match
+    /// fully contained in one chunk is already found by that chunk's own
+    /// search, and the carry — missing that match's first byte — can't
+    /// rediscover it).
+    static func occurrenceCount(of marker: String, in url: URL, chunkSize: Int = 1_048_576) -> Int {
+        guard let markerData = marker.data(using: .utf8), !markerData.isEmpty,
+              let handle = try? FileHandle(forReadingFrom: url) else { return 0 }
+        defer { try? handle.close() }
+
+        var count = 0
+        var carry = Data()
+        while let chunk = try? handle.read(upToCount: chunkSize), !chunk.isEmpty {
+            var buffer = carry
+            buffer.append(chunk)
+
+            var searchStart = buffer.startIndex
+            while let range = buffer.range(of: markerData, in: searchStart..<buffer.endIndex) {
+                count += 1
+                searchStart = range.upperBound
+            }
+
+            carry = buffer.suffix(markerData.count - 1)
+        }
+        return count
+    }
 }

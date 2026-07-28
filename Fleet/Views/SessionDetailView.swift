@@ -46,6 +46,7 @@ struct SessionDetailView: View {
                 detailRow(label: "项目路径", value: session.projectPath, mono: true)
                 detailRow(label: "最近活跃", value: session.lastActiveDescription)
                 detailRow(label: "记录大小", value: session.recordSizeDescription)
+                detailRow(label: "总轮次", value: "\(session.turnCount) 轮")
                 if let contextUsage = session.contextUsage {
                     detailRow(label: "上下文占用", value: contextUsage.description)
                 }

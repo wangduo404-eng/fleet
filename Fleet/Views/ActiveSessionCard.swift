@@ -115,6 +115,7 @@ struct ActiveSessionCard: View {
             HStack(alignment: .top, spacing: 24) {
                 statBlock(label: "上下文", value: session.contextUsage?.description ?? "暂无数据", lineLimit: 2)
                 statBlock(label: "记录大小", value: session.recordSizeDescription, lineLimit: 1)
+                statBlock(label: "总轮次", value: "\(session.turnCount) 轮", lineLimit: 1)
             }
             if let fraction = session.contextUsage?.fraction {
                 ProgressView(value: fraction)

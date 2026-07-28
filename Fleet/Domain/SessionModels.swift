@@ -77,6 +77,9 @@ struct SessionRecord: Identifiable, Sendable {
     let lastActiveAt: Date
     let fileSizeBytes: Int64
     let contextUsage: ContextUsage?
+    /// Completed conversation turns — Claude Code's `system`/`turn_duration`
+    /// events and Codex's `event_msg`/`task_complete` events respectively.
+    let turnCount: Int
     let resumeCommand: String
     var isBookmarked: Bool
 
