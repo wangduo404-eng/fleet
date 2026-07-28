@@ -2,7 +2,7 @@
 
 Mac 端菜单栏工具，扫描并展示本机 **Claude Code** / **Codex** 的历史与当前活跃 session——不用再翻终端窗口找回话，不用去记 session ID。
 
-![Fleet 首页：正在运行的船队](./docs/screenshots/home.png)
+![Fleet 首页：正在航行的船队](./docs/screenshots/home.png)
 
 ## 功能
 

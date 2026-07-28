@@ -81,7 +81,7 @@ struct MainContentView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .firstTextBaseline) {
-                Text("正在运行的船队")
+                Text("正在航行的船队")
                     .font(FleetFont.brandTitle(35))
                 Spacer()
                 Text("\(model.activeSessions.count) / \(model.sessions.count) 艘")
