@@ -42,7 +42,7 @@ struct ContextUsage: Sendable {
     var description: String {
         let used = Self.format(usedTokens)
         guard let windowTokens else {
-            return "≈\(used) tokens（无法确定窗口上限）"
+            return "≈\(used) tokens"
         }
         let percent = Int((Double(usedTokens) / Double(windowTokens) * 100).rounded())
         return "\(used) / \(Self.format(windowTokens)) tokens · \(percent)%"

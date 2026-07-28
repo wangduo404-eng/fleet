@@ -133,21 +133,25 @@ enum CodexScanner {
         return nil
     }
 
-    /// Best-effort parse of a `token_count` event. The exact shape of
-    /// `total_token_usage` / `last_token_usage` wasn't verified against a
-    /// captured real sample (see session-tracker-需求文档.md 4.1) — this
-    /// tries a couple of plausible shapes and degrades to nil rather than
-    /// risk showing a wrong number.
+    /// Parses a `token_count` event. Verified against a real captured sample
+    /// (2026-07-28): the line's top-level `type` is `event_msg`, not
+    /// `token_count` — that lives one level down at `payload.type`. And the
+    /// usage numbers are nested one level deeper still, under
+    /// `payload.info`, not directly on `payload`. The original guess (both
+    /// checked directly on `payload`) never matched anything on real data,
+    /// which is why Codex cards always showed "暂无数据".
     private static func lastTokenUsage(in lines: [String]) -> ContextUsage? {
         for line in lines.reversed() {
             guard let data = line.data(using: .utf8),
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  json["type"] as? String == "token_count",
-                  let payload = json["payload"] as? [String: Any] else { continue }
+                  json["type"] as? String == "event_msg",
+                  let payload = json["payload"] as? [String: Any],
+                  payload["type"] as? String == "token_count",
+                  let info = payload["info"] as? [String: Any] else { continue }
 
-            let windowTokens = payload["model_context_window"] as? Int
-            if let used = extractTokenCount(payload["last_token_usage"])
-                ?? extractTokenCount(payload["total_token_usage"]) {
+            let windowTokens = info["model_context_window"] as? Int
+            if let used = extractTokenCount(info["last_token_usage"])
+                ?? extractTokenCount(info["total_token_usage"]) {
                 return ContextUsage(usedTokens: used, windowTokens: windowTokens)
             }
         }
