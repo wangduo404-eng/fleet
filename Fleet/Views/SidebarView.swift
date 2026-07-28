@@ -80,12 +80,6 @@ struct SidebarView: View {
             }
 
             Spacer()
-
-            Label("设置", systemImage: "gearshape")
-                .font(.system(size: 16))
-                .foregroundStyle(.white.opacity(0.55))
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
         }
         .frame(width: 282, alignment: .leading)
         .frame(maxHeight: .infinity)
