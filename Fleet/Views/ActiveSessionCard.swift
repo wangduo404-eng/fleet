@@ -6,12 +6,11 @@ struct ActiveSessionCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Header: engine identity is now a labeled badge, not just a
-            // small icon — that plus a bigger name below is the fix for
-            // "no clear focal point" (2026-07-28 feedback). Status/time sits
-            // on its own row below — at the larger 2026-07-28 sizing, cramming
-            // badge + time + bookmark into one row was forcing "Claude Code"
-            // to wrap mid-word in the narrower column layout.
+            // Header: engine identity is a labeled badge, not just a small
+            // icon — that plus a bigger name below gives the card a clear
+            // focal point (2026-07-28 feedback). Status/time on its own row
+            // avoids cramming badge + time + bookmark into one row, which
+            // forced "Claude Code" to wrap mid-word at this font size.
             HStack(spacing: 8) {
                 engineBadge
                 Spacer()
@@ -27,7 +26,7 @@ struct ActiveSessionCard: View {
                     .font(.system(size: 13))
             }
             .foregroundStyle(textColor.opacity(0.55))
-            .padding(.top, 8)
+            .padding(.top, 5)
 
             EditableNameLabel(
                 name: session.displayName,
@@ -36,7 +35,7 @@ struct ActiveSessionCard: View {
             ) { newName in
                 model.rename(session, to: newName)
             }
-            .padding(.top, 12)
+            .padding(.top, 7)
 
             // Project path was dropped earlier when the name alone seemed
             // to say enough, but a fallback name like "yafo · 6d39dd8f"
@@ -45,16 +44,16 @@ struct ActiveSessionCard: View {
             Text(session.projectPath)
                 .font(FleetFont.mono(15))
                 .foregroundStyle(textColor.opacity(0.5))
-                .padding(.top, 3)
+                .padding(.top, 2)
                 .lineLimit(1)
                 .truncationMode(.middle)
 
             statRow
-                .padding(.top, 16)
+                .padding(.top, 10)
 
-            Spacer(minLength: 11)
+            Spacer(minLength: 6)
 
-            HStack(spacing: 11)  {
+            HStack(spacing: 11) {
                 Button("复制命令") {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(session.resumeCommand, forType: .string)
@@ -69,22 +68,20 @@ struct ActiveSessionCard: View {
                     .tint(.gray)
                     .disabled(true)
             }
-            .font(.system(size: 17))
-            .controlSize(.large)
+            .font(.system(size: 16))
         }
-        .padding(19)
+        .padding(15)
         // A firm height (not `maxHeight: .infinity`, which previously caused
         // a real bug: inside a 2-column LazyVGrid with 3+ cards, it made a
         // taller card try to fill *all* remaining scroll-view height rather
-        // than just its own row, overlapping row 2 — see AppModel/git
-        // history 2026-07-27). Sized generously above what the tallest
-        // content variant needs so nothing clips. Bumped ~35% overall
-        // (2026-07-28: cards read as too small / cramped even after the
-        // hierarchy redesign).
+        // than just its own row, overlapping row 2). Trimmed back down from
+        // 340 (2026-07-28: the bigger card required scrolling to see all 4
+        // on Home even though the bigger *window* was the actual ask) while
+        // keeping the larger, clearer typography from that pass.
         .frame(maxWidth: .infinity, alignment: .topLeading)
-        .frame(height: 340)
+        .frame(height: 244)
         .background(cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var engineBadge: some View {
@@ -106,20 +103,21 @@ struct ActiveSessionCard: View {
     /// Stat blocks (label above value, like a KPI tile) instead of plain
     /// text lines — and 上下文 always shows something, even when Codex has
     /// no context reading, so the two engines' cards share one structure
-    /// (2026-07-28 feedback: card structure read as inconsistent). 上下文's
-    /// value ("≈779.8K tokens（无法确定窗口上限）" and similar) is too long
-    /// for a half-width column without truncating with "…" — a second
-    /// instance of the "content isn't fully shown" feedback — so it gets
-    /// the full card width and can wrap to 2 lines; only 记录大小 (always
-    /// short, e.g. "23 MB") stays in a compact single-line block.
+    /// (2026-07-28 feedback: card structure read as inconsistent). Side by
+    /// side to save vertical space, but 上下文 gets a 2-line allowance
+    /// instead of truncating with "…" when the value is long (e.g.
+    /// "≈779.8K tokens（无法确定窗口上限）") — wrapping beats cutting
+    /// content off, which was the earlier "content isn't fully shown" bug.
     private var statRow: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            statBlock(label: "上下文", value: session.contextUsage?.description ?? "暂无数据", lineLimit: 2)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: 24) {
+                statBlock(label: "上下文", value: session.contextUsage?.description ?? "暂无数据", lineLimit: 2)
+                statBlock(label: "记录大小", value: session.recordSizeDescription, lineLimit: 1)
+            }
             if let fraction = session.contextUsage?.fraction {
                 ProgressView(value: fraction)
                     .tint(FleetColor.mint)
             }
-            statBlock(label: "记录大小", value: session.recordSizeDescription, lineLimit: 1)
         }
     }
 
@@ -130,7 +128,7 @@ struct ActiveSessionCard: View {
                 .tracking(0.5)
                 .foregroundStyle(textColor.opacity(0.4))
             Text(value)
-                .font(FleetFont.mono(15.5))
+                .font(FleetFont.mono(14.5))
                 .fontWeight(.medium)
                 .foregroundStyle(textColor.opacity(0.85))
                 .lineLimit(lineLimit)
