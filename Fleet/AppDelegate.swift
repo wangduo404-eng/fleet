@@ -4,6 +4,13 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var statusItem: NSStatusItem?
 
+    /// Set by FleetApp once the model exists. Fleet only scans on cold
+    /// launch otherwise (see AppModel.refresh) — there's no file watching or
+    /// polling — so a session created after launch would never appear until
+    /// the user fully quit and relaunched. Firing here means bringing the
+    /// window forward is effectively "reopening" it (2026-07-29 feedback).
+    var onWindowActivated: (() -> Void)?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.button?.image = NSImage(systemSymbolName: "sailboat.fill", accessibilityDescription: "Fleet")
@@ -30,6 +37,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         for window in NSApp.windows where window.title == "Fleet" {
             window.makeKeyAndOrderFront(nil)
         }
+        onWindowActivated?()
     }
 
     // Intercept the close button so the window hides instead of being

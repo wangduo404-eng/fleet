@@ -53,6 +53,10 @@ final class AppModel: ObservableObject {
     /// background process — this runs once per launch (see RootView), plus
     /// whenever the caller explicitly wants a fresh snapshot.
     func refresh() async {
+        // The window-activation trigger fires on every status-item click —
+        // rapid repeated clicks (observed in practice) shouldn't stack up
+        // concurrent scans.
+        guard !isLoading else { return }
         isLoading = true
         let scanned = await Task.detached(priority: .userInitiated) { () -> [SessionRecord] in
             ClaudeCodeScanner.scan() + CodexScanner.scan()

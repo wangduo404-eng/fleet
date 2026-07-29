@@ -9,6 +9,11 @@ struct FleetApp: App {
         WindowGroup("Fleet") {
             RootView()
                 .environmentObject(model)
+                .onAppear {
+                    appDelegate.onWindowActivated = { [weak model] in
+                        Task { await model?.refresh() }
+                    }
+                }
                 // V1's design (dark sidebar + light main content, specific
                 // card colors) never accounted for the system appearance —
                 // following system Dark Mode made "复制命令" and other
