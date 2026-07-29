@@ -18,7 +18,7 @@ struct FirstLaunchNoticeView: View {
 
             VStack(alignment: .leading, spacing: 14) {
                 noticeRow("Fleet 会读取本机 ~/.claude 和 ~/.codex 目录下的 session 记录（项目路径、活跃状态、上下文占用等），用来在这里展示。")
-                noticeRow("这些数据只留在这台电脑上——没有网络请求，不会上传到任何地方。")
+                noticeRow("Session 数据只留在这台电脑上，不会上传到任何地方。Fleet 唯一的网络请求是启动时去 GitHub 查一下有没有新版本，不涉及任何 session 内容。")
                 noticeRow("重命名和书签保存在 Fleet 自己的本地文件里，不会写回 Claude Code 或 Codex。")
             }
 

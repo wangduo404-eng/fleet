@@ -21,6 +21,12 @@ enum ViewMode {
     case browse
 }
 
+enum UpdateInstallState: Equatable {
+    case idle
+    case inProgress(String)
+    case failed(String)
+}
+
 @MainActor
 final class AppModel: ObservableObject {
     @Published var sessions: [SessionRecord] = []
@@ -35,6 +41,8 @@ final class AppModel: ObservableObject {
     @Published var searchText: String = ""
     @Published private(set) var isLoading = false
     @Published private(set) var lastSyncedAt: Date?
+    @Published private(set) var availableUpdate: AvailableUpdate?
+    @Published private(set) var updateInstallState: UpdateInstallState = .idle
 
     private static let firstLaunchAcknowledgedKey = "hasAcknowledgedFirstLaunchNotice"
 
@@ -47,6 +55,23 @@ final class AppModel: ObservableObject {
     func acknowledgeFirstLaunch() {
         hasAcknowledgedFirstLaunch = true
         UserDefaults.standard.set(true, forKey: AppModel.firstLaunchAcknowledgedKey)
+    }
+
+    /// Once per launch is enough — this is a convenience nudge, not
+    /// something that needs to notice a new release within seconds, and
+    /// GitHub's unauthenticated API is rate-limited per IP.
+    func checkForUpdate() async {
+        availableUpdate = await UpdateChecker.checkForUpdate()
+    }
+
+    func installAvailableUpdate() async {
+        guard let update = availableUpdate else { return }
+        let result = await UpdateInstaller.downloadAndInstall(update) { [weak self] status in
+            Task { @MainActor in self?.updateInstallState = .inProgress(status) }
+        }
+        if case .failure = result {
+            updateInstallState = .failed("更新失败，可以手动去 GitHub 下载安装")
+        }
     }
 
     /// Cold scan of both engines, off the main thread. Fleet doesn't run a

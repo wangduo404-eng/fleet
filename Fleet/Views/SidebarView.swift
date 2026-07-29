@@ -82,6 +82,12 @@ struct SidebarView: View {
 
             Spacer()
 
+            if let update = model.availableUpdate {
+                updateBanner(update)
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 10)
+            }
+
             HStack {
                 Text(versionString)
                     .font(.system(size: 12))
@@ -111,6 +117,36 @@ struct SidebarView: View {
     }
 
     private var browsing: Bool { model.viewMode == .browse }
+
+    @ViewBuilder
+    private func updateBanner(_ update: AvailableUpdate) -> some View {
+        switch model.updateInstallState {
+        case .idle:
+            Button {
+                Task { await model.installAvailableUpdate() }
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.down.circle.fill")
+                    Text("有新版本 v\(update.version)，点击更新")
+                }
+                .font(.system(size: 12.5, weight: .medium))
+                .foregroundStyle(FleetColor.mint)
+            }
+            .buttonStyle(.plain)
+        case .inProgress(let status):
+            HStack(spacing: 6) {
+                ProgressView()
+                    .controlSize(.mini)
+                Text(status)
+            }
+            .font(.system(size: 12.5))
+            .foregroundStyle(.white.opacity(0.6))
+        case .failed(let message):
+            Text(message)
+                .font(.system(size: 12.5))
+                .foregroundStyle(.orange)
+        }
+    }
 
     private var versionString: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"

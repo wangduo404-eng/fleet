@@ -22,6 +22,7 @@ struct RootView: View {
                 }
                 .task {
                     await model.refresh()
+                    await model.checkForUpdate()
                 }
             } else {
                 FirstLaunchNoticeView {
