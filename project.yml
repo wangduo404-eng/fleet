@@ -18,8 +18,8 @@ targets:
       path: Fleet/Info.plist
       properties:
         LSUIElement: true
-        CFBundleShortVersionString: "1.0.2"
-        CFBundleVersion: "4"
+        CFBundleShortVersionString: "1.0.3"
+        CFBundleVersion: "5"
         CFBundleIconName: AppIcon
     settings:
       base:
